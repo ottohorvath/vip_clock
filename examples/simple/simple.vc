@@ -1,0 +1,6 @@
+-F ${VIP_CLOCK_SV_HOME}/vip_clock.vc
+
++incdir+./
+./simple_pkg.sv
+./simple_dut.sv
+./simple_tb_top.sv
