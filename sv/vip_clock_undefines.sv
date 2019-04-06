@@ -1,0 +1,10 @@
+`ifndef VIP_CLOCK_UNDEFINES_SV
+`define VIP_CLOCK_UNDEFINES_SV
+
+`undef GETTER
+`undef SETTER
+`undef TESTER
+`undef ACCESSOR
+`undef RAND_CHECKER
+
+`endif//VIP_CLOCK_UNDEFINES_SV

@@ -1,0 +1,5 @@
++incdir+${VIP_CLOCK_SV_HOME}/seq
++incdir+${VIP_CLOCK_SV_HOME}/uvc
+
+${VIP_CLOCK_SV_HOME}/vip_clock_signal_if.sv
+${VIP_CLOCK_SV_HOME}/vip_clock_pkg.sv
