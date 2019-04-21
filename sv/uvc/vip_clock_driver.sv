@@ -10,6 +10,7 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
     protected vip_clock_types::state_t          state;
     protected bit                               new_item_rcvd;
     protected logic                             prev_clk;
+    protected event                             clock_tick_e;
 
     //==========================================================================
     function new(string name = "vip_clock_driver", uvm_component parent = null);
@@ -38,9 +39,9 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
     run_phase(uvm_phase phase);
         if (configuration.get_start_with_low())
         begin
-            intf.clk_drv <= 1'b0;
+            intf.clk_drv = 1'b0;
         end else begin
-            intf.clk_drv <= 1'b1;
+            intf.clk_drv = 1'b1;
         end
         if (configuration.get_start_with_auto_clock())
         begin
@@ -71,7 +72,10 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
             wait (new_item_rcvd == 0);
             if (item.enabled)
             begin
-                @ (intf.mon_cb);
+                if (!clock_tick_e.triggered)
+                begin
+                    @ (clock_tick_e);
+                end
             end else begin
                 wait (state == vip_clock_types::STOPPED);
             end
@@ -120,14 +124,14 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
                 end
                 vip_clock_types::LOW:
                 begin
-                    intf.clk_drv <= 1'b0;
+                    intf.clk_drv = 1'b0;
                     # (item.get_low_delay());
 
                     check_new_item_in_low_state();
                 end
                 vip_clock_types::HIGH:
                 begin
-                    intf.clk_drv <= 1'b1;
+                    intf.clk_drv = 1'b1;
                     # (item.get_low_delay());
 
                     check_new_item_in_high_state();
@@ -146,6 +150,7 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
         begin
             @ (intf.drv_cb);
             prev_clk = intf.drv_cb.clk;
+            -> clock_tick_e;
         end
     endtask
     //==========================================================================
