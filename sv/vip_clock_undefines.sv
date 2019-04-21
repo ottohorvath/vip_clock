@@ -5,6 +5,10 @@
 `undef SETTER
 `undef TESTER
 `undef ACCESSOR
-`undef RAND_CHECKER
+`undef GTN
+`undef CHK
+`undef CHK_FATAL
+`undef CHK_RAND
+`undef CHK_STD_RAND
 
 `endif//VIP_CLOCK_UNDEFINES_SV

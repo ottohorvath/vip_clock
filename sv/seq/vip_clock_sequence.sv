@@ -19,19 +19,17 @@ class vip_clock_sequence extends uvm_sequence #(vip_clock_seq_item);
     //==========================================================================
     task
     body();
-        bit success;
         vip_clock_seq_item  t;
         t = vip_clock_seq_item::type_id::create("clock_seq");
         start_item(t);
         t.enabled       = enabled     ;
         t.period        = period      ;
         t.initial_skew  = initial_skew;
-        success = t.randomize() with
+        `CHK_RAND(t, with
         {
             t.low_ratio  == low_ratio;
             t.high_ratio == high_ratio;
-        };
-        if (!success) `uvm_fatal(get_type_name(), "Failed to randomize 'clock_seq'!")
+        })
         finish_item(t);
     endtask
     //==========================================================================

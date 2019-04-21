@@ -44,14 +44,12 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
         end
         if (configuration.get_start_with_auto_clock())
         begin
-            bit                     success;
             vip_clock_seq_item      auto_clock_item;
             auto_clock_item         = vip_clock_seq_item::type_id::create("auto_clock_item");
             auto_clock_item.enabled         = 1   ;
             auto_clock_item.period          = 10.0;
             auto_clock_item.initial_skew    = 2.0 ;
-            success = auto_clock_item.randomize();
-            if (!success) `uvm_fatal(get_type_name(), "Failed to randomize 'auto_clock_item'!")
+            `CHK_RAND(auto_clock_item,)
             item = auto_clock_item;
             new_item_rcvd = 1;
         end

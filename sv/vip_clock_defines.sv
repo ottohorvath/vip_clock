@@ -21,9 +21,29 @@ endfunction
 `SETTER(``type``,``var``)\
 `TESTER(``type``,``var``)
 
-`define RAND_CHECKER\
-function void check_randomize(input bit succ, input string msg);\
-    if (!suc) `uvm_fatal(get_type_name(), msg)\
-endfunction
+`ifndef GTN
+    `define GTN get_type_name()
+`endif
+
+`ifndef CHK
+`define CHK(expr, msg, sev=error, id=`GTN) \
+    if (!(``expr``))\
+        `uvm_``sev``(``id``, $sformatf("Failed (%s) '%s' ", `"expr`", ``msg``))
+`endif
+
+`ifndef CHK_FATAL
+`define CHK_FATAL(expr, msg, id=`GTN) \
+    `CHK(``expr``,``msg``,fatal,``id``)
+`endif
+
+`ifndef CHK_RAND
+`define CHK_RAND(var, with_c=) \
+    `CHK_FATAL(``var``.randomize ``with_c``,"Randomize failed!")
+`endif
+
+`ifndef CHK_STD_RAND
+`define CHK_STD_RAND(vars, with_c=) \
+    `CHK_FATAL(std::randomize``vars`` ``with_c``,"Randomize failed!")
+`endif
 
 `endif//VIP_CLOCK_DEFINES_SV
