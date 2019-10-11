@@ -6,7 +6,6 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
 
     protected virtual vip_clock_signal_if       intf;
     protected vip_clock_agent_configuration     configuration;
-    protected vip_clock_seq_item                item;
     protected vip_clock_types::state_t          state;
     protected bit                               new_item_rcvd;
     protected logic                             prev_clk;
@@ -51,7 +50,7 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
             auto_clock_item.period          = 10.0;
             auto_clock_item.initial_skew    = 2.0 ;
             `CHK_RAND(auto_clock_item,)
-            item = auto_clock_item;
+            req = auto_clock_item;
             new_item_rcvd = 1;
         end
         fork
@@ -67,10 +66,10 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
     process_incoming_requests();
         forever
         begin
-            seq_item_port.get_next_item(item);
+            seq_item_port.get_next_item(req);
             new_item_rcvd = 1;
             wait (new_item_rcvd == 0);
-            if (item.enabled)
+            if (req.enabled)
             begin
                 if (!clock_tick_e.triggered)
                 begin
@@ -94,9 +93,9 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
                 begin
                     wait (new_item_rcvd);
                     new_item_rcvd = 0;
-                    if (item.enabled)
+                    if (req.enabled)
                     begin
-                        if (item.initial_skew > 0.0)
+                        if (req.initial_skew > 0.0)
                         begin
                             state = vip_clock_types::INITIAL_SKEW;
                         end
@@ -112,7 +111,7 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
                 end
                 vip_clock_types::INITIAL_SKEW:
                 begin
-                    # (item.initial_skew);
+                    # (req.initial_skew);
                     if (prev_clk === 1'b0)
                     begin
                         state = vip_clock_types::LOW;
@@ -125,14 +124,14 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
                 vip_clock_types::LOW:
                 begin
                     intf.clk_drv = 1'b0;
-                    # (item.get_low_delay());
+                    # (req.get_low_delay());
 
                     check_new_item_in_low_state();
                 end
                 vip_clock_types::HIGH:
                 begin
                     intf.clk_drv = 1'b1;
-                    # (item.get_low_delay());
+                    # (req.get_low_delay());
 
                     check_new_item_in_high_state();
                 end
@@ -161,9 +160,9 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
         if (new_item_rcvd)
         begin
             new_item_rcvd = 0;
-            if (item.enabled)
+            if (req.enabled)
             begin
-                if (item.initial_skew > 0.0)
+                if (req.initial_skew > 0.0)
                 begin
                     state = vip_clock_types::INITIAL_SKEW;
                 end else begin
@@ -184,9 +183,9 @@ class vip_clock_driver extends uvm_driver#(vip_clock_seq_item);
         if (new_item_rcvd)
         begin
             new_item_rcvd = 0;
-            if (item.enabled)
+            if (req.enabled)
             begin
-                if (item.initial_skew > 0.0)
+                if (req.initial_skew > 0.0)
                 begin
                     state = vip_clock_types::INITIAL_SKEW;
                 end else begin
